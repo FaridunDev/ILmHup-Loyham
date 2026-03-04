@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions
+from drf_spectacular.utils import extend_schema
 from .models import Course, Module, Lesson
 from .serializers import (
     CourseListSerializer, CourseDetailSerializer,
@@ -20,17 +21,20 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         return obj.instructor == request.user
 
 
+@extend_schema(tags=['Kurslar (Courses)'], summary="Barcha nashr etilgan kurslar ro'yxatini olish")
 class CourseListView(generics.ListAPIView):
     queryset = Course.objects.filter(is_published=True)
     serializer_class = CourseListSerializer
     permission_classes = (permissions.AllowAny,)
 
 
+@extend_schema(tags=['Kurslar (Courses)'], summary="Yangi kurs yaratish (Faqat o'qituvchilar uchun)")
 class CourseCreateView(generics.CreateAPIView):
     serializer_class = CourseCreateSerializer
     permission_classes = (IsInstructor,)
 
 
+@extend_schema(tags=['Kurslar (Courses)'], summary="Kurs ma'lumotlarini ko'rish, tahrirlash yoki o'chirish")
 class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Course.objects.all()
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
@@ -41,6 +45,7 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
         return CourseCreateSerializer
 
 
+@extend_schema(tags=['Kurslar (Courses)'], summary="O'qituvchining o'zi yaratgan kurslar ro'yxati")
 class InstructorCourseListView(generics.ListAPIView):
     serializer_class = CourseListSerializer
     permission_classes = (IsInstructor,)
@@ -49,6 +54,7 @@ class InstructorCourseListView(generics.ListAPIView):
         return Course.objects.filter(instructor=self.request.user)
 
 
+@extend_schema(tags=['Kurslar (Courses)'], summary="Kurs ichida yangi modul yaratish")
 class ModuleCreateView(generics.CreateAPIView):
     serializer_class = ModuleSerializer
     permission_classes = (IsInstructor,)
@@ -58,6 +64,7 @@ class ModuleCreateView(generics.CreateAPIView):
         serializer.save(course=course)
 
 
+@extend_schema(tags=['Kurslar (Courses)'], summary="Modul ichida yangi dars yaratish")
 class LessonCreateView(generics.CreateAPIView):
     serializer_class = LessonDetailSerializer
     permission_classes = (IsInstructor,)
@@ -67,6 +74,7 @@ class LessonCreateView(generics.CreateAPIView):
         serializer.save(module=module)
 
 
+@extend_schema(tags=['Kurslar (Courses)'], summary="Darsning to'liq mazmunini ko'rish (Video, kontent)")
 class LessonDetailView(generics.RetrieveAPIView):
     queryset = Lesson.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
