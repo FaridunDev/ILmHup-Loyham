@@ -35,7 +35,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Whitenoise shu yerda bo'lishi kerak
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -119,12 +119,16 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Online Learning Management System API',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': r'/api/v1/',  
     'SWAGGER_UI_SETTINGS': {
         'deepLinking': True,
         'persistAuthorization': True,
-        'displayOperationId': True,
-        'defaultModelsExpandDepth': -1,
+        'displayOperationId': False,     
+        'defaultModelsExpandDepth': -1,  
+        'filter': True,                
     },
+    'COMPONENT_SPLIT_PATCH': True,
+    'COMPONENT_SPLIT_REQUEST': True,
     'SECURITY': [{'jwtAuth': []}],
     'APPEND_COMPONENTS': {
         "securitySchemes": {
