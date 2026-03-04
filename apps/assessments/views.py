@@ -1,17 +1,26 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema # Importni qo'shdik
 from .models import Quiz, QuizResult, Answer
 from .serializers import QuizSerializer, QuizSubmitSerializer, QuizResultSerializer
 from apps.enrollments.models import Enrollment
 
-
+@extend_schema(
+    tags=['Testlar (Assessments)'], 
+    summary="Test savollarini olish",
+    description="Muayyan testning barcha savollari va javob variantlarini ko'rish."
+)
 class QuizDetailView(generics.RetrieveAPIView):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-
+@extend_schema(
+    tags=['Testlar (Assessments)'], 
+    summary="Testni topshirish va natijani hisoblash",
+    description="Foydalanuvchi tanlagan javob ID-larini yuboradi. Tizim avtomatik tekshirib, natijani saqlaydi."
+)
 class QuizSubmitView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -39,7 +48,11 @@ class QuizSubmitView(APIView):
 
         return Response(QuizResultSerializer(result).data)
 
-
+@extend_schema(
+    tags=['Testlar (Assessments)'], 
+    summary="Foydalanuvchining barcha test natijalari",
+    description="Tizimga kirgan foydalanuvchi topshirgan barcha testlari va ulardan olgan ballari ro'yxati."
+)
 class MyQuizResultsView(generics.ListAPIView):
     serializer_class = QuizResultSerializer
     permission_classes = (permissions.IsAuthenticated,)

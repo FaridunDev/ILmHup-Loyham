@@ -1,13 +1,17 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from drf_spectacular.utils import extend_schema # Importni qo'shdik
 from .models import LessonCompletion, CourseProgress
 from .serializers import LessonCompletionSerializer, CourseProgressSerializer
 from apps.courses.models import Lesson
 from apps.enrollments.models import Enrollment
 
-
+@extend_schema(
+    tags=['O\'zlashtirish (Progress)'], 
+    summary="Darsni tugatilgan deb belgilash",
+    description="Foydalanuvchi muayyan darsni tugatganda ushbu so'rov yuboriladi. Tizim avtomatik ravishda kursning umumiy foizini qayta hisoblaydi."
+)
 class MarkLessonCompleteView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -38,7 +42,11 @@ class MarkLessonCompleteView(APIView):
             'progress': CourseProgressSerializer(progress).data
         })
 
-
+@extend_schema(
+    tags=['O\'zlashtirish (Progress)'], 
+    summary="Foydalanuvchining barcha kurslardagi umumiy o'zlashtirishi",
+    description="Tizimga kirgan foydalanuvchi o'zi yozilgan barcha kurslardagi foiz ko'rsatkichlarini ro'yxat ko'rinishida oladi."
+)
 class MyCourseProgressView(generics.ListAPIView):
     serializer_class = CourseProgressSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -46,7 +54,11 @@ class MyCourseProgressView(generics.ListAPIView):
     def get_queryset(self):
         return CourseProgress.objects.filter(user=self.request.user)
 
-
+@extend_schema(
+    tags=['O\'zlashtirish (Progress)'], 
+    summary="Muayyan bir kurs bo'yicha o'zlashtirish detali",
+    description="Kurs ID-si orqali o'sha kursga doir o'zlashtirish foizi va holatini ko'rish."
+)
 class CourseProgressDetailView(generics.RetrieveAPIView):
     serializer_class = CourseProgressSerializer
     permission_classes = (permissions.IsAuthenticated,)

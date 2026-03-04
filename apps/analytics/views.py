@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from django.db.models import Count, Avg
+from drf_spectacular.utils import extend_schema # Importni qo'shdik
 from apps.courses.models import Course
 from apps.enrollments.models import Enrollment
 from apps.reviews.models import Review
@@ -12,6 +13,14 @@ class IsInstructor(permissions.BasePermission):
         return request.user.is_authenticated and request.user.is_instructor
 
 
+@extend_schema(
+    tags=['Tahlil va Statistika (Analytics)'], 
+    summary="O'qituvchi uchun dashboard statistikasi",
+    description=(
+        "O'qituvchiga tegishli barcha kurslar bo'yicha umumiy ma'lumotlar: "
+        "kurslar soni, talabalar soni, o'rtacha reyting va har bir kursning alohida statistikasi."
+    )
+)
 class InstructorDashboardView(APIView):
     permission_classes = (IsInstructor,)
 
