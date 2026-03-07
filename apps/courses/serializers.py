@@ -5,7 +5,7 @@ from .models import Course, Module, Lesson
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        fields = ('id', 'title', 'content', 'order', 'is_preview', 'duration')
+        fields = ('id', 'title', 'content', 'video_url', 'order', 'is_preview', 'duration')
 
 
 class LessonDetailSerializer(serializers.ModelSerializer):
