@@ -14,6 +14,12 @@ class AnswerDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'is_correct')
 
 
+class AnswerCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ('id', 'text', 'is_correct')
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     answers = AnswerSerializer(many=True, read_only=True)
 
@@ -22,12 +28,33 @@ class QuestionSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'order', 'answers')
 
 
+class QuestionCreateSerializer(serializers.ModelSerializer):
+    answers = AnswerCreateSerializer(many=True)
+
+    class Meta:
+        model = Question
+        fields = ('id', 'text', 'order', 'answers')
+
+    def create(self, validated_data):
+        answers_data = validated_data.pop('answers')
+        question = Question.objects.create(**validated_data)
+        for answer_data in answers_data:
+            Answer.objects.create(question=question, **answer_data)
+        return question
+
+
 class QuizSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Quiz
         fields = ('id', 'title', 'pass_percentage', 'questions')
+
+
+class QuizCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quiz
+        fields = ('id', 'title', 'pass_percentage', 'lesson')
 
 
 class QuizSubmitSerializer(serializers.Serializer):

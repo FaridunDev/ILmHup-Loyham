@@ -1,26 +1,49 @@
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema # Importni qo'shdik
-from .models import Quiz, QuizResult, Answer
-from .serializers import QuizSerializer, QuizSubmitSerializer, QuizResultSerializer
-from apps.enrollments.models import Enrollment
-
-@extend_schema(
-    tags=['Testlar (Assessments)'], 
-    summary="Test savollarini olish",
-    description="Muayyan testning barcha savollari va javob variantlarini ko'rish."
+from drf_spectacular.utils import extend_schema
+from .models import Quiz, Question, Answer, QuizResult
+from .serializers import (
+    QuizSerializer, QuizCreateSerializer, QuizSubmitSerializer,
+    QuizResultSerializer, QuestionCreateSerializer, AnswerCreateSerializer
 )
+from apps.enrollments.models import Enrollment
+from apps.courses.models import Lesson
+
+
+class IsInstructor(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.is_instructor
+
+
+@extend_schema(tags=['Testlar (Assessments)'], summary="Dars uchun yangi quiz yaratish (faqat o'qituvchi)")
+class QuizCreateView(generics.CreateAPIView):
+    serializer_class = QuizCreateSerializer
+    permission_classes = (IsInstructor,)
+
+    def perform_create(self, serializer):
+        lesson = Lesson.objects.get(pk=self.kwargs['lesson_pk'])
+        serializer.save(lesson=lesson)
+
+
+@extend_schema(tags=['Testlar (Assessments)'], summary="Quizga savol va javoblar qo'shish (faqat o'qituvchi)")
+class QuestionCreateView(generics.CreateAPIView):
+    serializer_class = QuestionCreateSerializer
+    permission_classes = (IsInstructor,)
+
+    def perform_create(self, serializer):
+        quiz = Quiz.objects.get(pk=self.kwargs['quiz_pk'])
+        serializer.save(quiz=quiz)
+
+
+@extend_schema(tags=['Testlar (Assessments)'], summary="Test savollarini olish")
 class QuizDetailView(generics.RetrieveAPIView):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-@extend_schema(
-    tags=['Testlar (Assessments)'], 
-    summary="Testni topshirish va natijani hisoblash",
-    description="Foydalanuvchi tanlagan javob ID-larini yuboradi. Tizim avtomatik tekshirib, natijani saqlaydi."
-)
+
+@extend_schema(tags=['Testlar (Assessments)'], summary="Testni topshirish va natijani hisoblash")
 class QuizSubmitView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -48,11 +71,8 @@ class QuizSubmitView(APIView):
 
         return Response(QuizResultSerializer(result).data)
 
-@extend_schema(
-    tags=['Testlar (Assessments)'], 
-    summary="Foydalanuvchining barcha test natijalari",
-    description="Tizimga kirgan foydalanuvchi topshirgan barcha testlari va ulardan olgan ballari ro'yxati."
-)
+
+@extend_schema(tags=['Testlar (Assessments)'], summary="Foydalanuvchining barcha test natijalari")
 class MyQuizResultsView(generics.ListAPIView):
     serializer_class = QuizResultSerializer
     permission_classes = (permissions.IsAuthenticated,)
