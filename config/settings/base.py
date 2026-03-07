@@ -109,6 +109,15 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+
+# --- CACHE (rate limit uchun) ---
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': os.getenv('REDIS_URL', 'redis://redis:6379/0'),
+    }
+}
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'IlmHub API',
     'DESCRIPTION': 'Online Learning Management System API',
