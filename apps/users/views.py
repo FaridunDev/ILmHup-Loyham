@@ -28,6 +28,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
 
 @extend_schema(tags=['Users'], summary="Login qilish - token, rol va ism qaytaradi")
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST', block=True), name='post')
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
