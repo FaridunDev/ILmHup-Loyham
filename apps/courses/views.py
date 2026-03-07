@@ -3,7 +3,7 @@ from drf_spectacular.utils import extend_schema
 from .models import Course, Module, Lesson
 from .serializers import (
     CourseListSerializer, CourseDetailSerializer,
-    CourseCreateSerializer, ModuleSerializer,
+    CourseCreateSerializer, CourseUpdateSerializer, ModuleSerializer,
     LessonSerializer, LessonDetailSerializer
 )
 from apps.enrollments.models import Enrollment
@@ -42,6 +42,8 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return CourseDetailSerializer
+        if self.request.method in ('PUT', 'PATCH'):
+            return CourseUpdateSerializer
         return CourseCreateSerializer
 
 

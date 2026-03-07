@@ -55,3 +55,10 @@ class CourseCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['instructor'] = self.context['request'].user
         return super().create(validated_data)
+
+
+class CourseUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ('id', 'title', 'description', 'thumbnail',
+                  'level', 'language', 'is_published')
