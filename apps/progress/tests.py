@@ -56,6 +56,7 @@ class ProgressTest(TestCase):
 
     def test_get_course_progress(self):
         self.client.force_authenticate(user=self.student)
+        self.client.post(f'/api/v1/progress/lesson/{self.lesson.id}/complete/')
         response = self.client.get(f'/api/v1/progress/course/{self.course.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
