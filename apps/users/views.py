@@ -1,11 +1,11 @@
-from rest_framework import generics, permissions, status
-from rest_framework.response import Response
+from rest_framework import generics, permissions
 from django.contrib.auth import get_user_model
-from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
-from .serializers import RegisterSerializer, UserProfileSerializer
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from django_ratelimit.decorators import ratelimit
+from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+from .serializers import RegisterSerializer, UserProfileSerializer, MyTokenObtainPairSerializer
 
 User = get_user_model()
 
@@ -17,6 +17,7 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = (permissions.AllowAny,)
 
+
 @extend_schema(tags=['Users'], summary="Foydalanuvchi profilini ko'rish va tahrirlash")
 class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserProfileSerializer
@@ -26,9 +27,10 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-@extend_schema(tags=['Users'], summary="Login qilish va JWT token olish")
+@extend_schema(tags=['Users'], summary="Login qilish - token, rol va ism qaytaradi")
 class MyTokenObtainPairView(TokenObtainPairView):
-    pass
+    serializer_class = MyTokenObtainPairSerializer
+
 
 @extend_schema(tags=['Users'], summary="JWT tokenni yangilash (refresh)")
 class MyTokenRefreshView(TokenRefreshView):
