@@ -16,14 +16,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Third party
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
     'drf_spectacular',
-
-    # Local apps
     'apps.users',
     'apps.courses',
     'apps.assessments',
@@ -95,7 +91,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- DRF SETTINGS ---
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -106,26 +101,24 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-# --- JWT SETTINGS ---
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# --- SWAGGER (SPECTACULAR) SETTINGS ---
 SPECTACULAR_SETTINGS = {
     'TITLE': 'IlmHub API',
     'DESCRIPTION': 'Online Learning Management System API',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    'SCHEMA_PATH_PREFIX': r'/api/v1/',  
+    'SCHEMA_PATH_PREFIX': r'/api/v1/',
     'SWAGGER_UI_SETTINGS': {
         'deepLinking': True,
         'persistAuthorization': True,
-        'displayOperationId': False,     
-        'defaultModelsExpandDepth': -1,  
-        'filter': True,                
+        'displayOperationId': False,
+        'defaultModelsExpandDepth': -1,
+        'filter': True,
     },
     'COMPONENT_SPLIT_PATCH': True,
     'COMPONENT_SPLIT_REQUEST': True,
@@ -141,17 +134,18 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-# --- CELERY ---
 CELERY_BROKER_URL = os.getenv('REDIS_URL')
 CELERY_RESULT_BACKEND = os.getenv('REDIS_URL')
 
-# --- AUTH MODEL ---
 AUTH_USER_MODEL = 'users.User'
 
 # --- CORS ---
 CORS_ALLOWED_ORIGINS = [
-    "http://194.36.88.189",
-    "http://localhost:3000",
+    origin.strip()
+    for origin in os.environ.get(
+        'CORS_ALLOWED_ORIGINS',
+        'http://194.36.88.189,http://localhost:3000,http://localhost:5173,http://localhost:4200'
+    ).split(',')
 ]
 CORS_ALLOW_CREDENTIALS = True
 
