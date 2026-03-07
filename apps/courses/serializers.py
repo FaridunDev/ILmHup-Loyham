@@ -30,7 +30,7 @@ class CourseListSerializer(serializers.ModelSerializer):
         model = Course
         fields = ('id', 'title', 'description', 'thumbnail', 'level',
                   'language', 'is_published', 'average_rating',
-                  'instructor_name', 'modules_count', 'created_at')
+                  'instructor_name', 'modules_count', 'price', 'is_free', 'created_at')
 
     def get_modules_count(self, obj):
         return obj.modules.count()
@@ -44,13 +44,13 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         model = Course
         fields = ('id', 'title', 'description', 'thumbnail', 'level',
                   'language', 'is_published', 'average_rating',
-                  'instructor_name', 'modules', 'created_at')
+                  'instructor_name', 'modules', 'price', 'is_free', 'created_at')
 
 
 class CourseCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ('id', 'title', 'description', 'thumbnail', 'level', 'language')
+        fields = ('id', 'title', 'description', 'thumbnail', 'level', 'language', 'price', 'is_free')
 
     def create(self, validated_data):
         validated_data['instructor'] = self.context['request'].user
@@ -61,4 +61,4 @@ class CourseUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ('id', 'title', 'description', 'thumbnail',
-                  'level', 'language', 'is_published')
+                  'level', 'language', 'is_published', 'price', 'is_free')
