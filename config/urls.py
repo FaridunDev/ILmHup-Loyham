@@ -3,20 +3,25 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import (
-    SpectacularAPIView, 
-    SpectacularRedocView, 
+    SpectacularAPIView,
+    SpectacularRedocView,
     SpectacularSwaggerView
 )
+from rest_social_auth.views import SocialJWTPairOnlyAuthView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # Swagger & ReDoc
+    # --- Swagger & ReDoc ---
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
-    # API v1 Apps
+    # --- Social Authentication ---
+    # Body da: {"provider": "google-oauth2", "code": "..."} yuboriladi
+    path('api/v1/users/social/', SocialJWTPairOnlyAuthView.as_view(), name='social_login'),
+
+    # --- API v1 Apps ---
     path('api/v1/users/', include('apps.users.urls')),
     path('api/v1/courses/', include('apps.courses.urls')),
     path('api/v1/assessments/', include('apps.assessments.urls')),
